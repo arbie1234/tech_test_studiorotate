@@ -10,13 +10,24 @@ class ScrabbleController {
     }
 
     setupRoutes() {
-        this.router.get('/scrabble-score', this.getWordScore.bind(this));
+        this.router.post('/scrabble-score', this.getWordScore.bind(this));
+        this.router.get('/scrabble-string', this.generateScrabbleString.bind(this));
     }
 
     async getWordScore(req, res) {
-        const { word } = req.query;
+        const word = req.body.word;
 
-        // validate word
+        // validate if word is empty
+        if (!word) {
+            return res.status(400).json({ error: 'Word is required' });
+        }
+
+        // validate if word contains only letters
+        if (!/^[a-zA-Z]+$/.test(word)) {
+            return res.status(400).json({ error: 'Word must contain only letters' });
+        }
+
+        // validate if word exist in dictionary
         const isValidWord = await this.dictionaryApiService.validateWord(word);
         if (!isValidWord) {
             return res.status(400).json({ error: 'Invalid word' });
@@ -24,6 +35,11 @@ class ScrabbleController {
 
         const score = wordService.calculateScore(word);
         res.json({ word, score });
+    }
+
+    async generateScrabbleString(req, res) {
+        const scrabbleString = wordService.generateScrabbleString();
+        res.json({ scrabbleString });
     }
 }
 
