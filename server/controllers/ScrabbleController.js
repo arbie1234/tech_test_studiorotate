@@ -5,7 +5,7 @@ const dictionaryApiService = require('../services/DictionaryApiService');
 class ScrabbleController {
     constructor() {
         this.router = express.Router();
-        this.dictionaryApiService = dictionaryApiService;
+        this.dictionaryApiService = new dictionaryApiService();
         this.setupRoutes();
     }
 
@@ -13,11 +13,11 @@ class ScrabbleController {
         this.router.get('/scrabble-score', this.getWordScore.bind(this));
     }
 
-    getWordScore(req, res) {
+    async getWordScore(req, res) {
         const { word } = req.query;
 
         // validate word
-        const isValidWord = this.dictionaryApiService.validateWord(word);
+        const isValidWord = await this.dictionaryApiService.validateWord(word);
         if (!isValidWord) {
             return res.status(400).json({ error: 'Invalid word' });
         }

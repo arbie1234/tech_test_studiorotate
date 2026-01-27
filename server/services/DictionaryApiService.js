@@ -1,11 +1,11 @@
 class DictionaryApiService {
     constructor() {
-        this.apiKey = process.env.DICTIONARY_API_KEY;
+        this.baseUrl = process.env.DICTIONARY_API_ENDPOINT;
     }
 
     // check if word exists in dictionary
     async validateWord(word) {
-        const response = await fetch(`${this.apiKey}/api/v2/entries/en/${word}`);
+        const response = await fetch(`${this.baseUrl}/api/v2/entries/en/${word}`);
         const data = await response.json();
         return data.length > 0;
     }
