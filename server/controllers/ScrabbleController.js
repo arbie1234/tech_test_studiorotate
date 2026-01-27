@@ -27,4 +27,7 @@ class ScrabbleController {
     }
 }
 
-module.exports = new ScrabbleController().router;
+module.exports = {
+    router: new ScrabbleController().router,
+    ScrabbleController
+};
