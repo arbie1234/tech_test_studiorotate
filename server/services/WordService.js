@@ -20,7 +20,7 @@ class WordService {
     generateScrabbleString() {
         const vowels = ['A', 'E', 'I', 'O', 'U'];
         const consonants = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'];
-        const length = Math.floor(Math.random() * 4) + 7;
+        const length = 7;
         let word = '';
         for (let i = 0; i < length; i++) {
             if (i < 2) {
