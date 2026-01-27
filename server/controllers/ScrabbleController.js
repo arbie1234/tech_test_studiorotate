@@ -8,6 +8,13 @@ class ScrabbleController {
     }
 
     setupRoutes() {
+        this.router.get('/scrabble-score', this.getWordScore.bind(this));
+    }
+
+    getWordScore(req, res) {
+        const { word } = req.query;
+        const score = wordService.calculateScore(word);
+        res.json({ word, score });
     }
 }
 
