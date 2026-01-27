@@ -14,6 +14,7 @@ describe('ScrabbleController', () => {
     beforeEach(() => {
         controller = new ScrabbleController();
         mockReq = {
+            body: {},
             query: {}
         };
         mockRes = {
@@ -26,26 +27,56 @@ describe('ScrabbleController', () => {
         jest.clearAllMocks();
     });
 
-    test('getWordScore should return 400 if word is invalid', async () => {
-        mockReq.query.word = 'invalid';
+    describe('getWordScore', () => {
+        test('should return 400 if word is missing in req.body', async () => {
+            mockReq.body.word = '';
 
-        // Mock DictionaryApiService.prototype.validateWord
-        DictionaryApiService.prototype.validateWord.mockResolvedValue(false);
+            await controller.getWordScore(mockReq, mockRes);
 
-        await controller.getWordScore(mockReq, mockRes);
+            expect(mockRes.status).toHaveBeenCalledWith(400);
+            expect(mockRes.json).toHaveBeenCalledWith({ error: 'Word is required' });
+        });
 
-        expect(mockRes.status).toHaveBeenCalledWith(400);
-        expect(mockRes.json).toHaveBeenCalledWith({ error: 'Invalid word' });
+        test('should return 400 if word contains non-letters', async () => {
+            mockReq.body.word = 'apple123';
+
+            await controller.getWordScore(mockReq, mockRes);
+
+            expect(mockRes.status).toHaveBeenCalledWith(400);
+            expect(mockRes.json).toHaveBeenCalledWith({ error: 'Word must contain only letters' });
+        });
+
+        test('should return 400 if word is invalid in dictionary', async () => {
+            mockReq.body.word = 'notaword';
+
+            DictionaryApiService.prototype.validateWord.mockResolvedValue(false);
+
+            await controller.getWordScore(mockReq, mockRes);
+
+            expect(mockRes.status).toHaveBeenCalledWith(400);
+            expect(mockRes.json).toHaveBeenCalledWith({ error: 'Invalid word' });
+        });
+
+        test('should return score if word is valid', async () => {
+            mockReq.body.word = 'apple';
+
+            DictionaryApiService.prototype.validateWord.mockResolvedValue(true);
+            wordService.calculateScore.mockReturnValue(9);
+
+            await controller.getWordScore(mockReq, mockRes);
+
+            expect(mockRes.json).toHaveBeenCalledWith({ word: 'apple', score: 9 });
+        });
     });
 
-    test('getWordScore should return score if word is valid', async () => {
-        mockReq.query.word = 'apple';
+    describe('generateScrabbleString', () => {
+        test('should return generated scrabble string from service', async () => {
+            const mockString = [{ letter: 'A', score: 1 }];
+            wordService.generateScrabbleString.mockReturnValue(mockString);
 
-        DictionaryApiService.prototype.validateWord.mockResolvedValue(true);
-        wordService.calculateScore.mockReturnValue(9);
+            await controller.generateScrabbleString(mockReq, mockRes);
 
-        await controller.getWordScore(mockReq, mockRes);
-
-        expect(mockRes.json).toHaveBeenCalledWith({ word: 'apple', score: 9 });
+            expect(mockRes.json).toHaveBeenCalledWith({ scrabbleString: mockString });
+        });
     });
 });
