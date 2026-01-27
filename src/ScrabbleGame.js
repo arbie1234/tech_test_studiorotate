@@ -105,7 +105,7 @@ const ScrabbleGame = () => {
                                     <button
                                         key={index}
                                         onClick={() => handleTileClick(tile.letter)}
-                                        className="w-16 h-16 bg-[#ffd493] border-4 border-[#eaaf56] rounded-lg font-bold text-2xl text-gray-800 shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 active:scale-95 cursor-pointer relative"
+                                        className="w-16 h-16 bg-[#ffd493] border-2 border-[#e9b05a] rounded-xl font-black text-2xl text-gray-800 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2),inset_0_-2px_4px_rgba(0,0,0,0.1)] hover:scale-105 transition-all duration-200 active:scale-95 cursor-pointer relative font-['Archivo_Black']"
                                     >
                                         {tile.letter}
                                         <span className="absolute bottom-1 right-1 text-xs font-semibold text-gray-600">
