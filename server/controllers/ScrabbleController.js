@@ -30,7 +30,7 @@ class ScrabbleController {
         // validate if word exist in dictionary
         const isValidWord = await this.dictionaryApiService.validateWord(word);
         if (!isValidWord) {
-            return res.status(400).json({ error: 'Invalid word' });
+            return res.status(400).json({ error: 'Invalid word. Try again!' });
         }
 
         const score = wordService.calculateScore(word);

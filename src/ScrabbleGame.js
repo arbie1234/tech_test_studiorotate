@@ -110,6 +110,10 @@ const ScrabbleGame = () => {
                 body: JSON.stringify({ word: currentWord }),
             });
             const data = await response.json();
+            if (data.error) {
+                setErrorMessage(data.error);
+                return;
+            }
             setScore(data.score);
             setTotalScore(prev => prev + data.score);
             setSubmittedWords(prev => [...prev, {
@@ -120,7 +124,7 @@ const ScrabbleGame = () => {
             setSelectedTileIndices([]);
             fetchTiles();
         } catch (error) {
-            console.log(error.error);
+            console.log(error);
         }
     };
 
@@ -159,7 +163,7 @@ const ScrabbleGame = () => {
                         {status === 'fail' && (
                             <div className="mb-4 p-4 bg-red-100 border-2 border-red-600 rounded-lg animate-shake">
                                 <p className="text-red-700 font-semibold text-center text-lg">
-                                    ✗ Invalid word. Try again!
+                                    ✗ {errorMessage}
                                 </p>
                             </div>
                         )}
