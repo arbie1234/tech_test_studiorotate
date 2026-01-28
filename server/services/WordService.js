@@ -23,12 +23,15 @@ class WordService {
         const length = 7;
         let word = '';
         for (let i = 0; i < length; i++) {
-            if (i < 2) {
+            if (i < 3) {
                 word += vowels[Math.floor(Math.random() * vowels.length)];
             } else {
                 word += consonants[Math.floor(Math.random() * consonants.length)];
             }
         }
+
+        // shuffle the word
+        word = word.split('').sort(() => Math.random() - 0.5).join('');
 
         // assign score to each letter
         var str = [];

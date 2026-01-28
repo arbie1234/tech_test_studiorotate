@@ -14,6 +14,7 @@ const ScrabbleGame = () => {
     const [availableTiles, setAvailableTiles] = useState([]);
     const [isTileAreaShaking, setisTileAreaShaking] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const API_URL = process.env.REACT_APP_API_URL;
 
@@ -101,7 +102,14 @@ const ScrabbleGame = () => {
     };
 
     const handleSubmit = async () => {
+        // check if word already submitted
+        if (submittedWords.some(w => w.word === currentWord)) {
+            setErrorMessage('You already submitted this word');
+            return;
+        }
+
         try {
+            setIsSubmitting(true);
             const response = await fetch(`${API_URL}/api/scrabble-score`, {
                 method: 'POST',
                 headers: {
@@ -110,6 +118,7 @@ const ScrabbleGame = () => {
                 body: JSON.stringify({ word: currentWord }),
             });
             const data = await response.json();
+            setIsSubmitting(false);
             if (data.error) {
                 setErrorMessage(data.error);
                 return;
@@ -151,22 +160,24 @@ const ScrabbleGame = () => {
             <div className="flex h-screen">
                 {/* Left Section - Input and Tiles */}
                 <div className="flex-1 flex items-center justify-center p-8">
-                    <div className="w-full max-w-2xl">
+                    <div className="w-full max-w-2xl relative">
                         {/* Status Messages */}
-                        {status === 'success' && (
-                            <div className="mb-4 p-4 bg-green-100 border-2 border-green-600 rounded-lg animate-bounce-in">
-                                <p className="text-green-700 font-semibold text-center text-lg">
-                                    ✓ Word accepted! +{score} points
-                                </p>
-                            </div>
-                        )}
-                        {status === 'fail' && (
-                            <div className="mb-4 p-4 bg-red-100 border-2 border-red-600 rounded-lg animate-shake">
-                                <p className="text-red-700 font-semibold text-center text-lg">
-                                    ✗ {errorMessage}
-                                </p>
-                            </div>
-                        )}
+                        <div className="absolute -top-20 left-0 right-0 z-50 pointer-events-none">
+                            {status === 'success' && (
+                                <div className="p-4 bg-green-100 border-2 border-green-600 rounded-lg animate-bounce-in shadow-lg pointer-events-auto">
+                                    <p className="text-green-700 font-semibold text-center text-lg">
+                                        ✓ Word accepted! +{score} points
+                                    </p>
+                                </div>
+                            )}
+                            {status === 'fail' && (
+                                <div className="p-4 bg-red-100 border-2 border-red-600 rounded-lg animate-shake shadow-lg pointer-events-auto">
+                                    <p className="text-red-700 font-semibold text-center text-lg">
+                                        ✗ {errorMessage}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Input Form */}
                         <div className="bg-white rounded-lg shadow-md p-6">
@@ -180,15 +191,16 @@ const ScrabbleGame = () => {
                                     placeholder="Enter word..."
                                 />
 
-                                {/* Yes Button */}
+                                {/* Submit Button */}
                                 <button
                                     onClick={handleSubmit}
-                                    className="px-8 py-4 bg-green-500 hover:bg-sky-600 text-white font-bold text-xl rounded-lg shadow-md transition-all duration-200 hover:shadow-lg active:scale-95"
+                                    className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-lg shadow-md transition-all duration-200 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={isSubmitting}
                                 >
                                     ✓
                                 </button>
 
-                                {/* No Button */}
+                                {/* Clear Button */}
                                 <button
                                     onClick={handleClear}
                                     className="px-8 py-4 bg-red-400 hover:bg-gray-500 text-white font-bold text-xl rounded-lg shadow-md transition-all duration-200 hover:shadow-lg active:scale-95"
