@@ -112,7 +112,10 @@ const ScrabbleGame = () => {
             const data = await response.json();
             setScore(data.score);
             setTotalScore(prev => prev + data.score);
-            setSubmittedWords(prev => [...prev, currentWord]);
+            setSubmittedWords(prev => [...prev, {
+                word: currentWord,
+                score: data.score
+            }]);
             setAvailableTiles([]);
             setSelectedTileIndices([]);
             fetchTiles();
