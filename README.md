@@ -18,15 +18,13 @@ Clone the project, change into the directory, and install dependencies:
 
 Install dependencies:
 
-```bash
 yarn
 ```
 
-Create a `.env` file if you plan on using environment variables:
+Create a `.env` file if you plan on using environment variables: Copy the .env.example file to .env file:
 
 ```bash
-touch .env
-```
+cp .env.example .env
 
 Run the project:
 
