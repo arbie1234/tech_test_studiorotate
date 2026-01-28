@@ -7,18 +7,31 @@ import { useEffect } from 'react';
 const ScrabbleGame = () => {
     // Sample state for demonstration
     const [selectedTileIndices, setSelectedTileIndices] = useState([]);
-    const [score, setScore] = useState(6);
-    const [totalScore, setTotalScore] = useState();
+    const [score, setScore] = useState(0);
+    const [totalScore, setTotalScore] = useState(0);
     const [status, setStatus] = useState(''); // fail, success or null
     const [submittedWords, setSubmittedWords] = useState([]);
     const [availableTiles, setAvailableTiles] = useState([]);
     const [isTileAreaShaking, setisTileAreaShaking] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const API_URL = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         fetchTiles();
     }, []);
+
+    useEffect(() => {
+        if (score > 0) {
+            showSuccessMessage();
+        }
+    }, [score])
+
+    useEffect(() => {
+        if (errorMessage) {
+            showErrorMessage();
+        }
+    }, [errorMessage])
 
     const fetchTiles = async () => {
         try {
@@ -88,11 +101,42 @@ const ScrabbleGame = () => {
     };
 
     const handleSubmit = async () => {
-
+        try {
+            const response = await fetch(`${API_URL}/api/scrabble-score`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ word: currentWord }),
+            });
+            const data = await response.json();
+            setScore(data.score);
+            setTotalScore(prev => prev + data.score);
+            setSubmittedWords(prev => [...prev, currentWord]);
+            setAvailableTiles([]);
+            setSelectedTileIndices([]);
+            fetchTiles();
+        } catch (error) {
+            console.log(error.error);
+        }
     };
 
     const handleClear = () => {
         setSelectedTileIndices([]);
+    };
+
+    const showErrorMessage = () => {
+        setStatus('fail');
+        setTimeout(() => {
+            setStatus(null);
+        }, 3000);
+    };
+
+    const showSuccessMessage = () => {
+        setStatus('success');
+        setTimeout(() => {
+            setStatus(null);
+        }, 3000);
     };
 
     return (
