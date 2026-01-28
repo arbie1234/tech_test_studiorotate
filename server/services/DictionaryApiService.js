@@ -1,6 +1,6 @@
 class DictionaryApiService {
     constructor() {
-        this.baseUrl = process.env.DICTIONARY_API_ENDPOINT;
+        this.baseUrl = process.env.REACT_APP_DICTIONARY_API_ENDPOINT;
     }
 
     // check if word exists in dictionary

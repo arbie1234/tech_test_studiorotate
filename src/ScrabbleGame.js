@@ -1,51 +1,98 @@
 import React, { useState } from 'react';
 import MiniWordTiles from './components/MiniWordTiles';
 import ScrabbleTile from './components/ScrabbleTile';
+import { useEffect } from 'react';
+
 
 const ScrabbleGame = () => {
     // Sample state for demonstration
-    const [currentWord, setCurrentWord] = useState('SAD');
+    const [selectedTileIndices, setSelectedTileIndices] = useState([]);
     const [score, setScore] = useState(6);
-    const [totalScore, setTotalScore] = useState(23);
-    const [isValid, setIsValid] = useState(false);
-    const [status, setStatus] = useState('success'); // 'success', 'fail', or null
-    const [submittedWords, setSubmittedWords] = useState([
-        { word: 'Dog', score: 3 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Mop', score: 10 },
-        { word: 'Cat', score: 5 }
-    ]);
-    const [availableTiles] = useState([
-        { letter: 'A', score: 1 },
-        { letter: 'I', score: 1 },
-        { letter: 'M', score: 3 },
-        { letter: 'X', score: 8 },
-        { letter: 'R', score: 1 },
-        { letter: 'H', score: 4 },
-        { letter: 'L', score: 1 },
-        { letter: 'F', score: 4 }
-    ]);
+    const [totalScore, setTotalScore] = useState();
+    const [status, setStatus] = useState(''); // fail, success or null
+    const [submittedWords, setSubmittedWords] = useState([]);
+    const [availableTiles, setAvailableTiles] = useState([]);
+    const [isTileAreaShaking, setisTileAreaShaking] = useState(false);
 
-    const handleTileClick = (letter) => {
-        setCurrentWord(currentWord + letter);
+    const API_URL = process.env.REACT_APP_API_URL;
+
+    useEffect(() => {
+        fetchTiles();
+    }, []);
+
+    const fetchTiles = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/scrabble-string`);
+            const data = await response.json();
+            setAvailableTiles(data.scrabbleString);
+        } catch (error) {
+            console.error('Error fetching tiles:', error);
+        }
     };
 
-    const handleYes = () => {
-        // Logic for validating and submitting the word
-        console.log('Yes clicked');
+    const triggerShake = () => {
+        setisTileAreaShaking(true);
+        setTimeout(() => setisTileAreaShaking(false), 500);
     };
 
-    const handleNo = () => {
-        setCurrentWord('');
+    const currentWord = selectedTileIndices.map(i => availableTiles[i]?.letter).join('') || '';
+
+    const handleTileClick = (letter, index) => {
+        if (selectedTileIndices.includes(index)) {
+            // remove the index
+            setSelectedTileIndices(prev => prev.filter(i => i !== index));
+        } else {
+            // add the index
+            if (selectedTileIndices.length < availableTiles.length) {
+                setSelectedTileIndices(prev => [...prev, index]);
+            } else {
+                triggerShake();
+            }
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const newValue = e.target.value.toUpperCase();
+
+        // remove the last index
+        if (newValue.length < currentWord.length) {
+            setSelectedTileIndices(prev => prev.slice(0, -1));
+            return;
+        }
+
+        const newChars = newValue.slice(currentWord.length).split('');
+        let currentIndices = [...selectedTileIndices];
+        let isValid = true;
+
+        for (const char of newChars) {
+            if (!/^[A-Z]$/.test(char)) {
+                isValid = false;
+                break;
+            }
+            const foundIndex = availableTiles.findIndex((t, i) =>
+                t.letter.toUpperCase() === char && !currentIndices.includes(i)
+            );
+            if (foundIndex !== -1) {
+                currentIndices.push(foundIndex);
+            } else {
+                isValid = false;
+                break;
+            }
+        }
+
+        if (isValid) {
+            setSelectedTileIndices(currentIndices);
+        } else {
+            triggerShake();
+        }
+    };
+
+    const handleSubmit = async () => {
+
+    };
+
+    const handleClear = () => {
+        setSelectedTileIndices([]);
     };
 
     return (
@@ -77,14 +124,14 @@ const ScrabbleGame = () => {
                                 <input
                                     type="text"
                                     value={currentWord}
-                                    onChange={(e) => setCurrentWord(e.target.value)}
+                                    onChange={handleInputChange}
                                     className="flex-1 px-6 py-4 text-2xl font-bold text-gray-800 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
                                     placeholder="Enter word..."
                                 />
 
                                 {/* Yes Button */}
                                 <button
-                                    onClick={handleYes}
+                                    onClick={handleSubmit}
                                     className="px-8 py-4 bg-green-500 hover:bg-sky-600 text-white font-bold text-xl rounded-lg shadow-md transition-all duration-200 hover:shadow-lg active:scale-95"
                                 >
                                     ✓
@@ -92,7 +139,7 @@ const ScrabbleGame = () => {
 
                                 {/* No Button */}
                                 <button
-                                    onClick={handleNo}
+                                    onClick={handleClear}
                                     className="px-8 py-4 bg-red-400 hover:bg-gray-500 text-white font-bold text-xl rounded-lg shadow-md transition-all duration-200 hover:shadow-lg active:scale-95"
                                 >
                                     ✘
@@ -102,13 +149,14 @@ const ScrabbleGame = () => {
 
                         {/* Tile Area - Directly Below Input */}
                         <div className="mt-6">
-                            <div className="flex flex-wrap gap-3 justify-center bg-slate-200 py-4 px-3 rounded-xl shadow-md">
+                            <div className={`flex flex-wrap gap-3 justify-center bg-slate-200 py-4 px-3 rounded-xl shadow-md ${isTileAreaShaking ? 'animate-shake' : ''}`}>
                                 {availableTiles.map((tile, index) => (
                                     <ScrabbleTile
                                         key={index}
                                         letter={tile.letter}
                                         text={tile.score}
-                                        onClick={() => handleTileClick(tile.letter)}
+                                        isDisabled={selectedTileIndices.includes(index)}
+                                        onClick={() => handleTileClick(tile.letter, index)}
                                     />
                                 ))}
                             </div>
@@ -122,7 +170,7 @@ const ScrabbleGame = () => {
                         <h2 className="text-2xl font-bold text-white mb-4 pb-3 border-b-2 border-sky-200">
                             Score: {totalScore}
                         </h2>
-                        <div className="space-y-3 flex-1 overflow-y-scroll">
+                        <div className="space-y-3 flex-1 overflow-y-auto">
                             {submittedWords.map((item, index) => (
                                 <div
                                     key={index}
