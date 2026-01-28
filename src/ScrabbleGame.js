@@ -155,6 +155,12 @@ const ScrabbleGame = () => {
         }, 3000);
     };
 
+    const handleEnterKey = (e) => {
+        if (e.key === 'Enter') {
+            handleSubmit();
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
             <div className="flex h-screen">
@@ -189,6 +195,7 @@ const ScrabbleGame = () => {
                                     onChange={handleInputChange}
                                     className="flex-1 px-6 py-4 text-2xl font-bold text-gray-800 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
                                     placeholder="Enter word..."
+                                    onKeyDown={handleEnterKey}
                                 />
 
                                 {/* Submit Button */}
