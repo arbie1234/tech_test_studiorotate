@@ -29,7 +29,7 @@ const ScrabbleGame = () => {
     }, [score])
 
     useEffect(() => {
-        if (errorMessage) {
+        if (errorMessage && errorMessage !== '') {
             showErrorMessage();
         }
     }, [errorMessage])
@@ -118,6 +118,7 @@ const ScrabbleGame = () => {
                 body: JSON.stringify({ word: currentWord }),
             });
             const data = await response.json();
+            console.log(data);
             setIsSubmitting(false);
             if (data.error) {
                 setErrorMessage(data.error);
@@ -144,6 +145,7 @@ const ScrabbleGame = () => {
     const showErrorMessage = () => {
         setStatus('fail');
         setTimeout(() => {
+            setErrorMessage('');
             setStatus(null);
         }, 3000);
     };
