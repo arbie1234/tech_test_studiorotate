@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import MiniWordTiles from './components/MiniWordTiles';
+import ScrabbleTile from './components/ScrabbleTile';
 
 const ScrabbleGame = () => {
     // Sample state for demonstration
@@ -102,16 +104,12 @@ const ScrabbleGame = () => {
                         <div className="mt-6">
                             <div className="flex flex-wrap gap-3 justify-center bg-slate-200 py-4 px-3 rounded-xl shadow-md">
                                 {availableTiles.map((tile, index) => (
-                                    <button
+                                    <ScrabbleTile
                                         key={index}
+                                        letter={tile.letter}
+                                        text={tile.score}
                                         onClick={() => handleTileClick(tile.letter)}
-                                        className="w-16 h-16 bg-[#ffd493] border-2 border-[#e9b05a] rounded-xl font-black text-2xl text-gray-800 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2),inset_0_-2px_4px_rgba(0,0,0,0.1)] hover:scale-105 transition-all duration-200 active:scale-95 cursor-pointer relative font-['Archivo_Black']"
-                                    >
-                                        {tile.letter}
-                                        <span className="absolute bottom-1 right-1 text-xs font-semibold text-gray-600">
-                                            {tile.score}
-                                        </span>
-                                    </button>
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -130,9 +128,9 @@ const ScrabbleGame = () => {
                                     key={index}
                                     className="flex justify-between items-center p-3 bg-sky-100 rounded-lg hover:bg-sky-200 transition-colors duration-200 mr-2"
                                 >
-                                    <span className="font-semibold text-gray-800 text-lg">
-                                        {item.word}
-                                    </span>
+                                    <div className="flex-1">
+                                        <MiniWordTiles word={item.word} />
+                                    </div>
                                     <span className="font-bold text-sky-600 text-lg">
                                         {item.score}
                                     </span>
