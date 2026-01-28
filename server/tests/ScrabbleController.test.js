@@ -54,7 +54,7 @@ describe('ScrabbleController', () => {
             await controller.getWordScore(mockReq, mockRes);
 
             expect(mockRes.status).toHaveBeenCalledWith(400);
-            expect(mockRes.json).toHaveBeenCalledWith({ error: 'Invalid word' });
+            expect(mockRes.json).toHaveBeenCalledWith({ error: 'Invalid word. Try again!' });
         });
 
         test('should return score if word is valid', async () => {

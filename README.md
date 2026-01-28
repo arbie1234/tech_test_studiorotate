@@ -34,6 +34,12 @@ yarn dev
 
 ---
 
+# Unit testing
+```bash
+npm run test:server
+```
+
+
 # The Technical Test
 
 This test is designed to give us a window into how you think, how you approach design and code, and how you express creativity within given constraints.
